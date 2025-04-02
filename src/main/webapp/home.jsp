@@ -356,50 +356,78 @@
             <span onclick="location.href='profile.jsp'" class="profile-icon">👤</span>
         </div>
     </div>
-    
-    <!-- Main Content -->
- <%@ page import="java.util.List" %>
+ <%@ page import="java.sql.*" %>
 <%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
+
 <%
-// Safely initialize image lists with defaults
+// Initialize empty lists
 List<String> homeImages = new ArrayList<>();
 List<String> adImages = new ArrayList<>();
 
-// Safely get image lists from request attributes
-Object homeImagesObj = request.getAttribute("homeImages");
-if (homeImagesObj instanceof List) {
-    for (Object item : (List<?>) homeImagesObj) {
-        if (item instanceof String) {
-            homeImages.add((String) item);
+try {
+    // Load database driver
+    Class.forName("com.mysql.cj.jdbc.Driver");
+    
+    // Establish connection
+    Connection con = DriverManager.getConnection(
+        "jdbc:mysql://localhost:3306/getWork", "root", "");
+    
+    // 1. Load ACTIVE home images (is_active=1)
+    Statement stmt = con.createStatement();
+    ResultSet rs = stmt.executeQuery(
+        "SELECT image_path FROM home_carousel " +
+        "WHERE image_type='home' AND is_active=1 " +
+        "ORDER BY display_order");
+    
+    while(rs.next()) {
+        String path = rs.getString("image_path");
+        if (path != null && !path.trim().isEmpty()) {
+            path = path.startsWith("images/") ? path : "images/" + path;
+            homeImages.add(path);
         }
     }
-}
-
-Object adImagesObj = request.getAttribute("adImages");
-if (adImagesObj instanceof List) {
-    for (Object item : (List<?>) adImagesObj) {
-        if (item instanceof String) {
-            adImages.add((String) item);
+    
+    // 2. Load ACTIVE ad images (is_active=1)
+    rs = stmt.executeQuery(
+        "SELECT image_path FROM home_carousel " +
+        "WHERE image_type='ad' AND is_active=1 " +
+        "ORDER BY display_order");
+    
+    while(rs.next()) {
+        String path = rs.getString("image_path");
+        if (path != null && !path.trim().isEmpty()) {
+            path = path.startsWith("images/") ? path : "images/" + path;
+            adImages.add(path);
         }
     }
-}
-
-// Set default images if empty
-if (homeImages.isEmpty()) {
-    homeImages.add("images/home.png");
-    homeImages.add("images/phy_2.png");
-}
-if (adImages.isEmpty()) {
-    adImages.add("images/ad4.png");
-    adImages.add("images/ad1.png");
-    adImages.add("images/1734687235149-cd2754.webp");
-    adImages.add("images/ad2.png");
-    adImages.add("images/ad3.png");
-    adImages.add("images/ad5.png");
+    
+    // Close resources
+    rs.close();
+    stmt.close();
+    con.close();
+    
+} catch(Exception e) {
+    e.printStackTrace();
+    
+    // Fallback images if database connection fails
+    if (homeImages.isEmpty()) {
+        homeImages.add("images/home.png");
+        homeImages.add("images/phy.png");
+        homeImages.add("images/phy_2.png");
+    }
+    if (adImages.isEmpty()) {
+        adImages.add("images/ad1.png");
+        adImages.add("images/ad2.png");
+        adImages.add("images/ad3.png");
+        adImages.add("images/ad4.png");
+        adImages.add("images/ad5.png");
+        adImages.add("images/1734687235149-cd2754.webp");
+    }
 }
 %>
 
-<!-- REST OF YOUR HTML CODE REMAINS EXACTLY THE SAME -->
+<!-- Your original container structure preserved exactly as you had it -->
 <div class="content">
     <div class="left">
         <h1>Hello, <span>${userName}</span></h1>
@@ -407,11 +435,12 @@ if (adImages.isEmpty()) {
     </div>
     <div class="right">
         <div class="grid-container">
-            <img src="<%= homeImages.get(0) %>" alt="Service Image">
+            <img src="<%= !homeImages.isEmpty() ? homeImages.get(0) : "images/home.png" %>" alt="Service Image">
         </div>
     </div>
 </div>
 
+<!-- Your original container exactly as you had it -->
 <div class="container">
     <div class="left3">
         <h2>What are you looking for?</h2>
@@ -447,6 +476,7 @@ if (adImages.isEmpty()) {
     </div>
 </div>
 
+<!-- Rest of your original HTML remains exactly the same -->
 <div class="slider">
     <div class="slides">
         <div class="slide">
@@ -484,7 +514,6 @@ if (adImages.isEmpty()) {
         <button>Buy Now</button>
     </div>
 </div>
-    
     <footer class="footer">
         <!-- Logo Section -->
         <div class="footer-logo">
