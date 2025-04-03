@@ -208,21 +208,20 @@
 
         .slide img {
             width: 100vw;
-            height: auto;
+            height: 100%;
             display: block;
         }
 
         @keyframes slide {
-            0% { transform: translateX(0); }
-            20% { transform: translateX(0); }
-            25% { transform: translateX(-100vw); }
-            45% { transform: translateX(-100vw); }
-            50% { transform: translateX(-200vw); }
-            70% { transform: translateX(-200vw); }
-            75% { transform: translateX(-300vw); }
-            95% { transform: translateX(-300vw); }
-            100% { transform: translateX(0); }
-        }
+    0% { transform: translateX(0); }
+    20% { transform: translateX(0); }
+    25% { transform: translateX(-100vw); }
+    45% { transform: translateX(-100vw); }
+    50% { transform: translateX(-200vw); }
+    70% { transform: translateX(-200vw); }
+    100% { transform: translateX(0); } /* Loop back after the 3rd slide */
+}
+
 
         .services {
             text-align: center;
@@ -248,8 +247,10 @@
         }
 
         .product img {
+        	height: 60%;
             width: 100%;
             border-radius: 10px;
+            
         }
 
         .product h3 {
@@ -264,6 +265,7 @@
 
         .product button {
             background: #6a0dad;
+            margin-top: 10px;
             color: white;
             border: none;
             padding: 10px 15px;
